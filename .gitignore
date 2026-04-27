@@ -22,6 +22,7 @@ build/
 coverage/
 *.tsbuildinfo
 next-env.d.ts
+frontend/src/generated/prisma/
 
 # Environment and local tool state
 .env
@@ -41,4 +42,3 @@ yarn-error.log*
 # OS/editor
 .DS_Store
 *.pem
-
