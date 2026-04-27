@@ -1,0 +1,18 @@
+# Port-based routing (recommended)
+api.blueres.org:8443 {
+    reverse_proxy localhost:8001
+}
+
+api.blueres.org:8444 {
+    reverse_proxy localhost:8002
+}
+
+# Path-based routing (alternative)
+# api.blueres.org {
+#     handle_path /jobs/* {
+#         reverse_proxy localhost:8001
+#     }
+#     handle_path /resumes/* {
+#         reverse_proxy localhost:8002
+#     }
+# }

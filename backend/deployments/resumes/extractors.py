@@ -83,3 +83,26 @@ class SkillsExtractor(Extractor):
             if text.strip():
                 results.append((text, f"[{i}]"))
         return results
+
+
+class WorkConcatExtractor(Extractor):
+    @property
+    def name(self) -> str:
+        return "Work Concat"
+
+    def get_keys(self) -> list[str]:
+        return ["work"]
+
+    def extract_texts(self, data: dict) -> list[tuple[str, str | None]]:
+        results = []
+        for i, entry in enumerate(data.get("work") or []):
+            parts = []
+            summary = entry.get("summary")
+            if summary and summary.strip():
+                parts.append(summary)
+            for highlight in entry.get("highlights") or []:
+                if highlight and highlight.strip():
+                    parts.append(highlight)
+            if parts:
+                results.append((" ".join(parts), f"[{i}]"))
+        return results

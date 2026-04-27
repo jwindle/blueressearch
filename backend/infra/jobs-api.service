@@ -1,0 +1,12 @@
+[Unit]
+Description=Jobs API
+After=network.target
+
+[Service]
+WorkingDirectory=%h/blueressearch/backend
+EnvironmentFile=%h/blueressearch/backend/.env
+ExecStart=%h/blueressearch/backend/.venv/bin/uvicorn deployments.jobs.main_sentence_transformers:app --host 127.0.0.1 --port 8001
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
