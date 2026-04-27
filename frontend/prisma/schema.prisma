@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Actor {
+  id         String         @id @default(uuid()) @db.Uuid
+  kind       String         @default("anonymous")
+  role       String         @default("anonymous")
+  active     Boolean        @default(true)
+  did        String?        @unique
+  handle     String?
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  lastSeenAt DateTime       @default(now()) @map("last_seen_at") @db.Timestamptz(6)
+  usage      UsageCounter[]
+
+  @@map("actors")
+}
+
+model UsageCounter {
+  id        String   @id @default(uuid()) @db.Uuid
+  actorId   String   @map("actor_id") @db.Uuid
+  eventName String   @map("event_name")
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  actor Actor @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@unique([actorId, eventName])
+  @@map("usage_counters")
+}
