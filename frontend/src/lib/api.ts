@@ -1,6 +1,8 @@
 import type {
   DocumentEmbeddingItem,
   ExtractorInfo,
+  MultiQuerySearchRequest,
+  MultiQuerySearchResponse,
   SearchableField,
   SearchRequest,
   SearchResponse,
@@ -42,6 +44,12 @@ export function createApiClient(baseUrl: string) {
 
     searchTopK: (req: TopKSearchRequest) =>
       apiFetch<TopKSearchResponse>(baseUrl, "/search/top-k", {
+        method: "POST",
+        body: JSON.stringify(req),
+      }),
+
+    searchMultiQuery: (req: MultiQuerySearchRequest) =>
+      apiFetch<MultiQuerySearchResponse>(baseUrl, "/search/multi-query", {
         method: "POST",
         body: JSON.stringify(req),
       }),

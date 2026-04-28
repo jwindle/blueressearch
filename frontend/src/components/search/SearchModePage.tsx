@@ -8,6 +8,8 @@ import { createApiClient } from "@/lib/api"
 import { SearchForm } from "./SearchForm"
 import { SearchResults } from "./SearchResults"
 import { TopKResults } from "./TopKResults"
+import { MultiQueryForm } from "./MultiQueryForm"
+import type { MultiQueryParams } from "./MultiQueryForm"
 import type { ExtractorInfo, SearchableField, SearchResult, TopKSearchResult, FilterCondition } from "@/types/api"
 
 interface SearchParams {
@@ -49,6 +51,7 @@ export function SearchModePage({
   const [fields, setFields] = useState<SearchableField[]>([])
   const [standardResults, setStandardResults] = useState<SearchResult[]>([])
   const [topKResults, setTopKResults] = useState<TopKSearchResult[]>([])
+  const [multiQueryResults, setMultiQueryResults] = useState<TopKSearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [metaError, setMetaError] = useState<string | null>(null)
@@ -101,6 +104,31 @@ export function SearchModePage({
       setLoading(false)
     }
   }, [backend, mode])
+
+  const runMultiQuerySearch = useCallback(async (params: MultiQueryParams) => {
+    if (!backend) return
+    const validQueries = params.queryTexts.filter(q => q.trim())
+    if (validQueries.length === 0 || params.extractorNames.length === 0) return
+    setLoading(true)
+    setError(null)
+    try {
+      const client = createApiClient(backend.url)
+      const res = await client.searchMultiQuery({
+        query_texts: validQueries,
+        extractor_names: params.extractorNames,
+        filters: params.filters,
+        limit: 20,
+      })
+      setMultiQueryResults(res.results)
+      setStandardResults([])
+      setTopKResults([])
+      setHasSearched(true)
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setLoading(false)
+    }
+  }, [backend])
 
   function handleSearch(params: SearchParams) {
     const sp = new URLSearchParams()
@@ -164,23 +192,31 @@ export function SearchModePage({
         </div>
       )}
 
-      <SearchForm
-        extractors={extractors}
-        fields={fields}
-        onSearch={handleSearch}
-        loading={loading}
-        mode={mode}
-        initialValues={{
-          query: initialQ,
-          extractorNames: initialExtractors ?? undefined,
-          distinctByDocument: initialDistinct,
-          filters: initialFilters,
-          k: initialK,
-          docUrl: initialDocUrl,
-        }}
-        autoSearch={!!initialQ}
-        runSearch={runSearch}
-      />
+      {mode === "multi-query" ? (
+        <MultiQueryForm
+          extractors={extractors}
+          onSearch={runMultiQuerySearch}
+          loading={loading}
+        />
+      ) : (
+        <SearchForm
+          extractors={extractors}
+          fields={fields}
+          onSearch={handleSearch}
+          loading={loading}
+          mode={mode}
+          initialValues={{
+            query: initialQ,
+            extractorNames: initialExtractors ?? undefined,
+            distinctByDocument: initialDistinct,
+            filters: initialFilters,
+            k: initialK,
+            docUrl: initialDocUrl,
+          }}
+          autoSearch={!!initialQ}
+          runSearch={runSearch}
+        />
+      )}
 
       {error && (
         <div className="px-4 py-3 rounded-lg text-sm" style={{ background: "#fee2e2", color: "#991b1b", borderLeft: "3px solid #ef4444" }}>
@@ -188,11 +224,14 @@ export function SearchModePage({
         </div>
       )}
 
-      {hasSearched && mode !== "top-k" && (
-        <SearchResults results={standardResults} extractors={extractors} DocumentCard={backend.DocumentCard} backendId={backendId} pinnedId={pinnedId} />
+      {hasSearched && mode === "multi-query" && (
+        <TopKResults results={multiQueryResults} DocumentCard={backend.DocumentCard} backendId={backendId} pinnedId={pinnedId} />
       )}
       {hasSearched && mode === "top-k" && (
         <TopKResults results={topKResults} DocumentCard={backend.DocumentCard} backendId={backendId} pinnedId={pinnedId} />
+      )}
+      {hasSearched && mode !== "top-k" && mode !== "multi-query" && (
+        <SearchResults results={standardResults} extractors={extractors} DocumentCard={backend.DocumentCard} backendId={backendId} pinnedId={pinnedId} />
       )}
     </div>
   )

@@ -20,6 +20,7 @@ export interface BackendConfig {
 const SEARCH_MODES: SearchMode[] = [
   { id: "standard", name: "Top 1" },
   { id: "top-k", name: "Top K" },
+  { id: "multi-query", name: "Multi Query" },
 ]
 
 export const backends: BackendConfig[] = [

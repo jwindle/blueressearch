@@ -84,3 +84,18 @@ export interface TopKSearchResponse {
   results: TopKSearchResult[]
   total: number
 }
+
+export interface MultiQuerySearchRequest {
+  query_texts: string[]
+  extractor_names: string[]
+  candidate_limit?: number
+  filters?: FilterCondition[]
+  doc_url?: string | null
+  limit?: number
+  offset?: number
+}
+
+export interface MultiQuerySearchResponse {
+  results: TopKSearchResult[]
+  total: number
+}

@@ -123,6 +123,21 @@ class TopKSearchResponse(BaseModel):
     total: int
 
 
+class MultiQuerySearchRequest(BaseModel):
+    query_texts: list[str]
+    extractor_names: list[str]
+    candidate_limit: int = 100
+    filters: list[FilterCondition] = []
+    doc_url: str | None = None
+    limit: int = 10
+    offset: int = 0
+
+
+class MultiQuerySearchResponse(BaseModel):
+    results: list[TopKSearchResult]
+    total: int
+
+
 # ── Document embeddings ──────────────────────────────────────────────────────
 
 class DocumentEmbeddingItem(BaseModel):
