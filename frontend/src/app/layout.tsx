@@ -2,27 +2,11 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { backends } from "@/config/backends"
-import Link from "next/link"
-
-function ExternalLinkIcon() {
-  return (
-    <svg
-      width="10"
-      height="10"
-      viewBox="0 0 10 10"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="inline-block ml-0.5 translate-y-[-1px]"
-    >
-      <path d="M4 2H2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V6" />
-      <path d="M6.5 1H9v2.5M9 1 5 5" />
-    </svg>
-  )
-}
+import { NavDropdown } from "@/components/NavDropdown"
+import type { NavItem } from "@/components/NavDropdown"
+import { getSession } from "@/lib/auth"
+import { getOauthClient } from "@/lib/oauth"
+import { redirect } from "next/navigation"
 
 const yourJobsUrl = process.env.NEXT_PUBLIC_YOUR_JOBS_URL || null
 const yourResumesUrl = process.env.NEXT_PUBLIC_YOUR_RESUMES_URL || null
@@ -35,7 +19,23 @@ export const metadata: Metadata = {
   description: "Vector search across Blueres deployments",
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+async function logout() {
+  "use server"
+  const session = await getSession()
+  if (session.did) {
+    try { await getOauthClient().revoke(session.did) } catch { /* best-effort */ }
+  }
+  session.destroy()
+  redirect("/")
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession()
+  const yourContentItems: NavItem[] = [
+    ...(yourJobsUrl ? [{ href: yourJobsUrl, label: "Your Job Posts", external: true }] : []),
+    ...(yourResumesUrl ? [{ href: yourResumesUrl, label: "Your Résumés", external: true }] : []),
+  ]
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
@@ -43,59 +43,65 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           className="border-b px-4 py-3 flex items-center gap-6"
           style={{ borderColor: "var(--border)" }}
         >
-          <Link href="/" className="font-semibold text-sm tracking-tight">
+          <a href="/" className="font-semibold text-sm tracking-tight">
             BlueRes Search
-          </Link>
+          </a>
           <nav className="flex items-center gap-4">
-            {backends.map(b => (
-              <Link
-                key={b.id}
-                href={`/search/${b.id}`}
-                className="text-sm hover:opacity-70 transition-opacity"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                {b.name}
-              </Link>
-            ))}
-            <Link
-              href="/text-to-job-post"
-              className="text-sm hover:opacity-70 transition-opacity"
-              style={{ color: "var(--muted-foreground)" }}
-            >
-              Text to Job Post
-            </Link>
-            <a
-              href="/match-and-edit"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm hover:opacity-70 transition-opacity"
-              style={{ color: "var(--muted-foreground)" }}
-            >
-              Match &amp; Edit<ExternalLinkIcon />
-            </a>
-            {yourJobsUrl && (
-              <a
-                href={yourJobsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm hover:opacity-70 transition-opacity"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                Your Job Posts<ExternalLinkIcon />
-              </a>
-            )}
-            {yourResumesUrl && (
-              <a
-                href={yourResumesUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm hover:opacity-70 transition-opacity"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                Your Résumés<ExternalLinkIcon />
-              </a>
+            <NavDropdown
+              label="Search"
+              items={backends.map(b => ({ href: `/search/${b.id}`, label: b.name }))}
+            />
+            <NavDropdown
+              label="Match"
+              items={[
+                { href: "/match-and-edit-doc-doc",   label: "Doc vs Doc" },
+                { href: "/match-and-edit-text-doc",  label: "Text vs Doc" },
+                { href: "/match-and-edit-text-text", label: "Text vs Text" },
+              ]}
+            />
+            <NavDropdown
+              label="Refine"
+              items={[
+                { href: "/refine-resume-helper", label: "Resume" },
+              ]}
+            />
+            <NavDropdown
+              label="Text To"
+              items={[
+                { href: "/text-to-job-post", label: "Job Post" },
+                { href: "/text-to-resume", label: "Resume" },
+              ]}
+            />
+            {yourContentItems.length > 0 && (
+              <NavDropdown label="Your Content" items={yourContentItems} />
             )}
           </nav>
+          <div className="ml-auto flex items-center gap-3">
+            {session.did ? (
+              <>
+                <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+                  {session.handle ?? session.did}
+                </span>
+                <form action={logout}>
+                  <button
+                    type="submit"
+                    className="text-xs px-3 py-1 rounded border transition-colors"
+                    style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}
+                  >
+                    Sign out
+                  </button>
+                </form>
+              </>
+            ) : (
+              <a
+                href="/sign-in"
+                className="text-xs px-3 py-1 rounded border transition-colors"
+                style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+              >
+                Sign in
+              </a>
+            )}
+          </div>
         </header>
         <main>{children}</main>
       </body>

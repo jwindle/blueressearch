@@ -9,7 +9,7 @@ from .. import tables
 from ..core.embedder import Embedder
 from ..core.registry import Registry
 from .dependencies import get_conn, get_embedder, get_registry
-from .schemas import DocumentEmbeddingItem, DocumentResponse, DocumentUpsert, EmbedRequest
+from .schemas import DocumentEmbeddingItem, DocumentResponse, DocumentUpsert, EmbedRequest, EmbedTextsRequest
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -53,6 +53,18 @@ async def embed_document(
                 embedding=list(embedding),
             ))
     return result
+
+
+@router.post("/embed-text", response_model=list[DocumentEmbeddingItem])
+async def embed_texts(
+    body: EmbedTextsRequest,
+    embedder: Embedder = Depends(get_embedder),
+) -> list[DocumentEmbeddingItem]:
+    vectors = await embedder.aembed(body.texts)
+    return [
+        DocumentEmbeddingItem(extractor_name="text", subkey=str(i), text=text, embedding=list(vector))
+        for i, (text, vector) in enumerate(zip(body.texts, vectors))
+    ]
 
 
 @router.delete("/{doc_id}", status_code=200)

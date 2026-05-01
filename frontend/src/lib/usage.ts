@@ -11,6 +11,7 @@ export type UsageEvent =
   | "top_k_search"
   | "embed_document"
   | "text_to_job_post"
+  | "text_to_resume"
   | "add_document"
 
 export async function getOrCreateActor() {

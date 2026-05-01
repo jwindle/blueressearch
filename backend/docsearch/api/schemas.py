@@ -16,6 +16,10 @@ class EmbedRequest(BaseModel):
     data: dict[str, Any]
 
 
+class EmbedTextsRequest(BaseModel):
+    texts: list[str]
+
+
 class DocumentResponse(BaseModel):
     id: UUID
     url: str | None

@@ -68,6 +68,12 @@ export function createApiClient(baseUrl: string) {
         method: "POST",
         body: JSON.stringify({ data }),
       }),
+
+    embedTexts: (texts: string[]) =>
+      apiFetch<DocumentEmbeddingItem[]>(baseUrl, `/documents/embed-text`, {
+        method: "POST",
+        body: JSON.stringify({ texts }),
+      }),
   }
 }
 

@@ -11,6 +11,7 @@ import { TopKResults } from "./TopKResults"
 import { MultiQueryForm } from "./MultiQueryForm"
 import type { MultiQueryParams } from "./MultiQueryForm"
 import type { ExtractorInfo, SearchableField, SearchResult, TopKSearchResult, FilterCondition } from "@/types/api"
+import { InfoTooltip } from "@/components/InfoTooltip"
 
 interface SearchParams {
   query: string
@@ -117,6 +118,7 @@ export function SearchModePage({
         query_texts: validQueries,
         extractor_names: params.extractorNames,
         filters: params.filters,
+        doc_url: params.docUrl || null,
         limit: 20,
       })
       setMultiQueryResults(res.results)
@@ -155,8 +157,11 @@ export function SearchModePage({
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-baseline justify-between gap-4">
-        <h1 className="text-2xl font-semibold">{backend.name}</h1>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-semibold">{backend.name}</h1>
+          <InfoTooltip text={backend.description} />
+        </div>
         {backend.atCollection && (
           <Link
             href={`/add/${backendId}`}
@@ -195,6 +200,7 @@ export function SearchModePage({
       {mode === "multi-query" ? (
         <MultiQueryForm
           extractors={extractors}
+          fields={fields}
           onSearch={runMultiQuerySearch}
           loading={loading}
         />
