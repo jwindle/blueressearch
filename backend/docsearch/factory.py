@@ -21,6 +21,11 @@ def create_app(registry: Registry, database_url: str, embedder: Embedder) -> Fas
     async def lifespan(app: FastAPI):
         yield
         await engine.dispose()
+        try:
+            from joblib.externals.loky import get_reusable_executor
+            get_reusable_executor().shutdown(wait=True, kill_workers=True)
+        except Exception:
+            pass
 
     app = FastAPI(title="Vector Search API", lifespan=lifespan)
 
