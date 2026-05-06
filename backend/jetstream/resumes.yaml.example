@@ -1,0 +1,8 @@
+# python -m jetstream.cli --config jetstream/resumes.yaml
+collection: org.blueres.resume.resume
+base_url: http://localhost:8001
+# api_key: set via DOCSEARCH_API_KEY env var or here
+log_level: INFO
+# cursor: 1234567890000000  # microsecond timestamp to replay from
+# endpoint: wss://jetstream2.us-west.bsky.network/subscribe
+# max_message_size_bytes: 0
