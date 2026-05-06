@@ -56,10 +56,16 @@ export default function Home() {
       <div className="space-y-4">
         <h1 className="text-4xl font-semibold tracking-tight">BlueRes Search</h1>
         <p className="text-lg leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-          Semantic search and matching for job posts and résumés on the AT Protocol.
-          Documents are broken into text chunks, embedded into a vector space, and
-          retrieved by similarity — going beyond keyword matching to surface
-          genuinely relevant results.
+          Résumés and job posts are public data — so why shouldn't the matching
+          process be transparent too? BlueRes Search is a proof-of-concept that
+          uses semantic embeddings to search and match job posts and résumés on
+          the AT Protocol, without relying on a black-box AI.
+        </p>
+        <p className="text-base leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+          Both document types are broken into structured fields, embedded into
+          a shared vector space, and retrieved or compared by similarity. The
+          goal is to show that job-to-candidate matching can be done in a way
+          that is open, inspectable, and clearly articulated — no magic required.
         </p>
       </div>
 
@@ -72,7 +78,7 @@ export default function Home() {
         />
         <FeatureCard
           title="Match"
-          description="Compare two documents — or free-form text — by embedding distance. See which sections align closely and get a headline average score, useful for evaluating job-to-candidate fit."
+          description="Compare two documents — or free-form text — by embedding distance. For each section in a reference document, find the closest match in the other and average the scores."
           links={[
             { href: "/match-and-edit-doc-doc",   label: "Doc vs Doc",   external: true },
             { href: "/match-and-edit-text-doc",  label: "Text vs Doc",  external: true },
@@ -81,8 +87,11 @@ export default function Home() {
         />
         <FeatureCard
           title="Text To"
-          description="Convert unstructured text into structured documents. Paste a raw job posting and an agent will parse it into a typed JSON object ready for indexing and search."
-          links={[{ href: "/text-to-job-post", label: "Job Post" }]}
+          description="Convert unstructured text into structured JSON. Paste a raw job posting or résumé and an LLM will segment and parse it into a typed document ready for indexing."
+          links={[
+            { href: "/text-to-job-post", label: "Job Post" },
+            { href: "/text-to-resume",   label: "Résumé" },
+          ]}
         />
       </div>
 
@@ -92,9 +101,9 @@ export default function Home() {
           How it works
         </h2>
         <ol className="space-y-2 text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-          <li><span className="font-medium" style={{ color: "var(--foreground)" }}>1. Ingest.</span> Documents are fetched from the AT Protocol network and stored. Configurable extractors pull the text fields that matter for search.</li>
-          <li><span className="font-medium" style={{ color: "var(--foreground)" }}>2. Embed.</span> Each extracted chunk is passed to an embedding model and stored as a vector alongside the source document.</li>
-          <li><span className="font-medium" style={{ color: "var(--foreground)" }}>3. Search.</span> A query is embedded the same way and the closest vectors are returned — optionally filtered by metadata fields.</li>
+          <li><span className="font-medium" style={{ color: "var(--foreground)" }}>1. Structure.</span> Raw job posts and résumés are parsed into typed JSON schemas — job posts using a custom schema, résumés using jsonresume.</li>
+          <li><span className="font-medium" style={{ color: "var(--foreground)" }}>2. Embed.</span> Configurable extractors pull the text fields that matter, each chunk is passed to an embedding model, and the vectors are stored alongside the source document.</li>
+          <li><span className="font-medium" style={{ color: "var(--foreground)" }}>3. Search or match.</span> A query or reference document is embedded the same way. Search returns the closest documents; matching scores each section pair and averages the result.</li>
         </ol>
       </div>
 
