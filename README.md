@@ -1,32 +1,32 @@
 # Motivation
 
-Hey all 👋!  Your resume is public.  Job posts are public.  Given that neither
+Hey all 👋!  Your résumé is public.  Job posts are public.  Given that neither
 of these data are private, there should be a completely open ecosystem of
 matching people looking for jobs with people trying to fill jobs.
 
 There has been some good work in that direction.  As of writing this, it seems
 like <https://sifa.id> has a lot of momentum.  Sifa is focused on enabling
-individuals to publish and possess their resumes and professional network.
+individuals to publish and possess their résumés and professional network.
 
 Here, I want to explore something slightly different: the job-matching process.
 In particular, I want to take a look at how people are matched to jobs and how
-that relates to optimizing a resume for a given job post.
+that relates to optimizing a résumé for a given job post.
 
 To tackle this, I will rely solely on semantic embeddings.  This is, admittedly,
 a somewhat small step.  LLMs already do a very good job of telling you how your
-resume matches a job post.  In fact, this is now a feature built into LinkedIn.
-An agent will assess how well your resume matches a job posting and can also
+résumé matches a job post.  In fact, this is now a feature built into LinkedIn.
+An agent will assess how well your résumé matches a job posting and can also
 make suggestions about what is missing.
 
 But relying on an LLM doesn't seem strictly necessary to me.  Job posts and
-resumes often include quite a bit of structured data.  Effectively, what one
-wants to do is try to match data from a job post with data in a resume.  If we
-can do a decent job matching job posts and resumes with semantic embeddings,
+résumés often include quite a bit of structured data.  Effectively, what one
+wants to do is try to match data from a job post with data in a résumé.  If we
+can do a decent job matching job posts and résumés with semantic embeddings,
 then we have a POC that this is not a poorly posed problem, but rather one
 that we can clearly articulate.
 
 Why does this matter?  Because transparency matters.  Right now AI is being used
-to filter your resume when you apply for a job.  It's a bit of a game.  The game
+to filter your résumé when you apply for a job.  It's a bit of a game.  The game
 would be much more fair if we all knew exactly how that filtering process
 worked.  Here, I want to show that it should be possible to be much more
 transparent about that process.
@@ -36,8 +36,8 @@ infrastructure to validate that POC.
 
 # Approach
 
-To start, we need to impose some structure on resumes and job posts.  For
-resumes, I will use [jsonresume](https://jsonresume.org/) (with a few additions
+To start, we need to impose some structure on résumés and job posts.  For
+résumés, I will use [jsonresume](https://jsonresume.org/) (with a few additions
 for fun).  For job posts, I just created my own generic schema.  In my
 experience a job post will typically have what I call "Employee Traits", which
 are the qualities sought in the potential employee, and "Job Traits", which are
@@ -51,7 +51,7 @@ embedding.  The process is the same for both:
 
 ```
 Job post -> List of extracted texts -> Embeddings for job post
-Resume -> List of extracted texts -> Embeddings for resumes
+Résumé -> List of extracted texts -> Embeddings for résumés
 ```
 
 The nice thing about the above diagram, is that you can see that this is a
@@ -60,8 +60,8 @@ embeddings.  By using the same embedder for each, we can link the semantics of
 both types of documents.
 
 There are two immediate use-cases: i) search and ii) matching.  By search, I
-mean the process of finding a job post or resume of interest.  By matching, I
-mean the ability to score how well a job post matches a resume.
+mean the process of finding a job post or résumé of interest.  By matching, I
+mean the ability to score how well a job post matches a résumé.
 
 ## Search and Match
 
@@ -85,12 +85,12 @@ If you navigate to <https://search.blueres.org> (I am not claiming to be good at
 naming things!) you will find a site with some fake (and maybe real) data.
 
 You can:
-- Search jobs and resumes
-- Match text within jobs and resumes
-- Convert text to a json job post or a json resume
+- Search jobs and résumés
+- Match text within jobs and résumés
+- Convert text to a json job post or a json résumé
 
 If you want to add your own data and see how it works, there are sites for
-saving a job post or resume to your PDS at
+saving a job post or résumé to your PDS at
 - <https://jobs.blueres.org>
 - <https://res.blueres.org>
 
