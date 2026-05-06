@@ -1,7 +1,7 @@
 # BlueRes Search Backend
 
 The backend contains the generic document search API, concrete deployments for
-BlueRes jobs and resumes, and Jetstream ingesters for keeping docsearch in sync
+BlueRes jobs and resumes, and a Jetstream ingester for keeping docsearch in sync
 with ATProto records.
 
 ## Packages
@@ -28,15 +28,13 @@ Current deployments:
 - `deployments.resumes`: resume search for `org.blueres.resume.resume`
 
 Each deployment registers its own extractors and embedder, then creates a
-FastAPI app with `docsearch.factory.create_app()`. Deployment modules also
-include seed scripts for initializing searchable fields and Jetstream wrapper
-commands for running collection-specific ingesters.
+FastAPI app with `docsearch.factory.create_app()`.
 
-Example API startup:
+Run both APIs (from `backend/`):
 
 ```sh
-DATABASE_URL=... uvicorn deployments.jobs.main_sentence_transformers:app --port 8001
-DATABASE_URL=... uvicorn deployments.resumes.main_sentence_transformers:app --port 8002
+env $(cat deployments/jobs/.env | xargs) uvicorn deployments.jobs.main_sentence_transformers:app --host 127.0.0.1 --port 8001 &
+env $(cat deployments/resumes/.env | xargs) uvicorn deployments.resumes.main_sentence_transformers:app --host 127.0.0.1 --port 8002
 ```
 
 ### `jetstream`
@@ -49,24 +47,25 @@ builds the AT URI for each record, and calls the docsearch API:
 - create/update events call `POST /documents`
 - delete events call `DELETE /documents?url=...`
 
-Deployment wrappers provide fixed collection IDs:
+Run using a config file (from `backend/`):
 
 ```sh
-python -m deployments.jobs.jetstream run --base-url http://localhost:8001
-python -m deployments.resumes.jetstream run --base-url http://localhost:8002
+python -m jetstream.cli --config jetstream/jobs.yaml
+python -m jetstream.cli --config jetstream/resumes.yaml
 ```
 
-See `jetstream/README.md` for more usage details.
+See `jetstream/README.md` for configuration details.
 
 ## Configuration
 
-Common environment variables:
+Each deployment has its own `.env` file under `deployments/jobs/.env` and
+`deployments/resumes/.env`. Common variables:
 
-- `DATABASE_URL`: Postgres connection URL for a docsearch deployment
-- `DOCSEARCH_API_KEY`: bearer token accepted by regular API endpoints
-- `DOCSEARCH_ADMIN_KEY`: bearer token accepted by admin endpoints
+- `DATABASE_URL`: async Postgres connection URL (`postgresql+asyncpg://...`)
+- `DOCSEARCH_API_KEY`: bearer token for regular API endpoints
+- `DOCSEARCH_ADMIN_KEY`: bearer token for admin endpoints
 - `OPENAI_API_KEY`: required when using the OpenAI embedder
-- `JETSTREAM_ENDPOINT`: optional override for the Jetstream websocket endpoint
+- `EMBEDDING_DIMENSION`: vector dimension (must match the embedder)
 
 ## Development
 
@@ -78,6 +77,4 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-Run a deployment with `uvicorn`, then initialize its database with the matching
-seed script.
-
+See `backend/.env.example` for required environment variables.

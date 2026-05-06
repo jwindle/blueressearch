@@ -3,78 +3,68 @@
 Next.js frontend for searching, comparing, and creating documents for the
 BlueRes docsearch backends.
 
-The app expects docsearch API backends for jobs and resumes. Server-side API
-proxy targets are configured with:
+## Environment Variables
 
-- `JOBS_API_URL`
-- `RESUMES_API_URL`
+### Required
 
-Optional external navbar links can be configured with:
+- `JOBS_API_URL` — URL of the jobs docsearch backend
+- `RESUMES_API_URL` — URL of the resumes docsearch backend
+- `FRONTEND_DATABASE_URL` — Postgres connection string (pooled)
+- `FRONTEND_DATABASE_DIRECT_URL` — Postgres connection string (direct, for migrations)
+- `APP_URL` — Public URL of this app (used for ATProto OAuth)
+- `SESSION_SECRET` — Secret for signing session cookies (min 32 chars)
+- `DOCSEARCH_API_KEY` — API key for the docsearch backends
+- `DOCSEARCH_ADMIN_KEY` — Admin API key for the docsearch backends
+- `OPENAI_API_KEY` — OpenAI API key (required for Text To pages)
 
-- `NEXT_PUBLIC_YOUR_JOBS_URL`
-- `NEXT_PUBLIC_YOUR_RESUMES_URL`
+### Optional
 
-## Navbar Pages
+- `ENABLE_ADVANCED=true` — Enables the Text To pages (disabled by default)
+- `NEXT_PUBLIC_YOUR_JOBS_URL` — External link shown in the navbar under "Your Content"
+- `NEXT_PUBLIC_YOUR_RESUMES_URL` — External link shown in the navbar under "Your Content"
 
-### BlueRes Search
+## Pages
 
-Route: `/`
+### Search
 
-Redirects to the default search page for the first configured backend.
+Route: `/search/[backendId]`
 
-### Jobs
+Semantic search over the jobs or resumes backend. Supports three modes:
 
-Route: `/search/jobs`
+- **Nearest neighbour** — returns the single closest document
+- **Top-K chunk** — returns the top-K closest chunks, deduplicated by document
+- **Multi-query** — runs multiple query variants and merges results
 
-Searches the jobs docsearch backend. The jobs backend is configured for the
-`org.blueres.jobs.jobPost` ATProto collection and renders results as job post
-cards. Search supports the available backend modes, including Top 1 and Top K.
+### Match
 
-### Résumés
+Routes: `/match-and-edit-doc-doc`, `/match-and-edit-text-doc`, `/match-and-edit-text-text`
 
-Route: `/search/resumes`
+Compare two documents (or free-form text) by embedding distance. Shows per-section
+similarity scores and a headline average. Opens in a new tab.
 
-Searches the resumes docsearch backend. The resumes backend is configured for
-the `org.blueres.resume.resume` ATProto collection and renders results as
-resume cards. Search supports the available backend modes, including Top 1 and
-Top K.
+### Refine
 
-### Text to Job Post
+Route: `/refine-resume-helper`
 
-Route: `/text-to-job-post`
+Interactive resume refinement tool. Requires authentication.
 
-Converts plain text job descriptions into structured job post JSON suitable for
-the jobs backend.
+### Text To (requires `ENABLE_ADVANCED=true`)
 
-### Match & Edit
+- `/text-to-job-post` — Paste unstructured job post text; an LLM segments it into
+  labelled sections, which you can review and edit before generating structured JSON.
+- `/text-to-resume` — Same two-step flow for résumés.
 
-Route: `/match-and-edit`
+### Admin
 
-Opens a matching and editing workspace in a new tab. This page is used to
-compare job and resume content, inspect embedding matches, and edit candidate
-document JSON.
+Route: `/admin/usage`
 
-### Your Job Posts
+Usage statistics table. Only accessible to actors with `role = "admin"` in the database.
 
-External link. Shown only when `NEXT_PUBLIC_YOUR_JOBS_URL` is set.
+### Other Routes
 
-Links to the separate BlueRes jobs app for managing the current user's job
-posts.
-
-### Your Résumés
-
-External link. Shown only when `NEXT_PUBLIC_YOUR_RESUMES_URL` is set.
-
-Links to the separate BlueRes resumes app for managing the current user's
-resumes.
-
-## Other Routes
-
-- `/add/[backendId]`: add a document from an ATProto record into a docsearch
-  backend.
-- `/document/[backendId]/[docId]`: inspect a stored document.
-- `/match`: compare a selected job and resume from search-result links.
-- `/matchedit`: legacy redirect to `/match-and-edit`.
+- `/add/[backendId]` — Add a document from an ATProto record into a backend
+- `/document/[backendId]/[docId]` — Inspect a stored document
+- `/sign-in` — Bluesky OAuth sign-in
 
 ## Development
 
