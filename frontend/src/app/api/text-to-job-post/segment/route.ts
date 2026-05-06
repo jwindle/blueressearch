@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { advancedEnabled } from "@/lib/features"
 import { segmentJobPost } from "@/lib/text-to-job-post"
+import { trackUsage } from "@/lib/usage"
 
 export async function POST(request: Request) {
   if (!advancedEnabled()) {
@@ -11,6 +12,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const text = typeof body.text === "string" ? body.text : ""
     const sections = await segmentJobPost(text)
+    await trackUsage("jobs:llm_call")
     return NextResponse.json({ sections })
   } catch (error) {
     return NextResponse.json(

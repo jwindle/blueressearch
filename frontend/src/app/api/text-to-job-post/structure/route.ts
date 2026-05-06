@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const sections: Section[] = Array.isArray(body.sections) ? body.sections : []
     const jobPost = await sectionsToJobPost(sections)
-    await trackUsage("text_to_job_post")
+    await trackUsage("jobs:llm_call")
     return NextResponse.json({ jobPost })
   } catch (error) {
     return NextResponse.json(

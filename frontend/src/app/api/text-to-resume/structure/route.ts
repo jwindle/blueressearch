@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const sections: Section[] = Array.isArray(body.sections) ? body.sections : []
     const resume = await sectionsToResume(sections)
-    await trackUsage("text_to_resume")
+    await trackUsage("resumes:llm_call")
     return NextResponse.json({ resume })
   } catch (error) {
     return NextResponse.json(

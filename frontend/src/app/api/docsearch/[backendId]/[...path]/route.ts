@@ -25,6 +25,7 @@ function authKeyFor(path: string): string | undefined {
 function usageEventFor(method: string, path: string): UsageEvent | null {
   if (method === "POST" && path === "/search") return "simple_search"
   if (method === "POST" && path === "/search/top-k") return "top_k_search"
+  if (method === "POST" && path === "/search/multi-query") return "multi_query_search"
   if (method === "POST" && path === "/documents/embed") return "embed_document"
   if (method === "POST" && path === "/documents") return "add_document"
   return null
@@ -67,7 +68,7 @@ async function forward(
 
   const usageEvent = usageEventFor(request.method, forwardedPath)
   if (usageEvent && response.ok) {
-    await trackUsage(usageEvent)
+    await trackUsage(`${backendId}:${usageEvent}`)
   }
 
   const responseHeaders = new Headers()

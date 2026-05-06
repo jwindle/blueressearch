@@ -6,13 +6,7 @@ import { prisma } from "@/lib/prisma"
 const ACTOR_COOKIE = "br_actor_id"
 const ACTOR_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 
-export type UsageEvent =
-  | "simple_search"
-  | "top_k_search"
-  | "embed_document"
-  | "text_to_job_post"
-  | "text_to_resume"
-  | "add_document"
+export type UsageEvent = string
 
 export async function getOrCreateActor() {
   const cookieStore = await cookies()
