@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type FormEvent } from "react"
 import { createApiClient } from "@/lib/api"
+import { LIMITS } from "@/lib/limits"
 import {
   type MatchPair,
   matchEmbeddings,
@@ -94,6 +95,7 @@ export function MatchEditTextPage() {
           title="Left (Text)"
           texts={leftTexts}
           onChange={texts => { setLeftTexts(texts); setPairs([]) }}
+          maxLength={LIMITS.EMBEDDING_QUERY}
         />
         <JsonEditor
           title="Right JSON"

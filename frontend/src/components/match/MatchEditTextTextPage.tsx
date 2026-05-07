@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react"
 import { backends } from "@/config/backends"
+import { LIMITS } from "@/lib/limits"
 import { createApiClient } from "@/lib/api"
 import {
   type MatchPair,
@@ -73,11 +74,13 @@ export function MatchEditTextTextPage() {
           title="Left"
           texts={leftTexts}
           onChange={texts => { setLeftTexts(texts); setPairs([]) }}
+          maxLength={LIMITS.EMBEDDING_QUERY}
         />
         <TextInputList
           title="Right"
           texts={rightTexts}
           onChange={texts => { setRightTexts(texts); setPairs([]) }}
+          maxLength={LIMITS.EMBEDDING_QUERY}
         />
       </div>
 

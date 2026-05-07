@@ -6,6 +6,7 @@ import { CopyJsonButton } from "@/components/documents/CopyJsonButton"
 import { JobPostCard } from "@/components/documents/JobPostCard"
 import { InfoTooltip } from "@/components/InfoTooltip"
 import { jsonEditorExtensions } from "@/components/match/shared"
+import { LIMITS } from "@/lib/limits"
 import { SECTION_LABELS } from "@/lib/text-to-job-post"
 import type { Section, GeneratedJobPost } from "@/lib/text-to-job-post"
 import type { JobPost } from "@/types/documents"
@@ -179,6 +180,7 @@ export function TextToJobPostClient() {
           value={text}
           onChange={e => setText(e.target.value)}
           rows={12}
+          maxLength={LIMITS.RAW_TEXT}
           placeholder="Paste an unstructured job post..."
           className="w-full text-sm rounded border px-3 py-2 resize-y"
           style={{ background: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}

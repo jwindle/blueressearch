@@ -6,6 +6,7 @@ import { CopyJsonButton } from "@/components/documents/CopyJsonButton"
 import { ResumeCard } from "@/components/documents/ResumeCard"
 import { InfoTooltip } from "@/components/InfoTooltip"
 import { jsonEditorExtensions } from "@/components/match/shared"
+import { LIMITS } from "@/lib/limits"
 import { SECTION_LABELS } from "@/lib/text-to-resume"
 import type { Section } from "@/lib/text-to-resume"
 import type { Resume } from "@/types/documents"
@@ -170,6 +171,7 @@ export function TextToResumeClient() {
         <textarea
           value={text}
           onChange={e => setText(e.target.value)}
+          maxLength={LIMITS.RAW_TEXT}
           rows={12}
           placeholder="Paste an unstructured resume..."
           className="w-full text-sm rounded border px-3 py-2 resize-y"

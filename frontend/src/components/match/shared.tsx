@@ -327,10 +327,12 @@ export function TextInputList({
   title,
   texts,
   onChange,
+  maxLength,
 }: {
   title: string
   texts: string[]
   onChange: (texts: string[]) => void
+  maxLength?: number
 }) {
   function set(i: number, value: string) {
     onChange(texts.map((t, idx) => (idx === i ? value : t)))
@@ -349,6 +351,7 @@ export function TextInputList({
             <textarea
               value={t}
               onChange={e => set(i, e.target.value)}
+              maxLength={maxLength}
               placeholder={`Text ${i + 1}…`}
               rows={4}
               className="flex-1 text-sm rounded border px-3 py-2 resize-y font-mono"

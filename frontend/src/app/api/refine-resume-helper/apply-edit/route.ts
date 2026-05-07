@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { advancedEnabled } from "@/lib/features"
+import { checkLength, LIMITS } from "@/lib/limits"
 import { applyResumeEdit } from "@/lib/refine-resume-helper"
 
 export async function POST(request: Request) {
@@ -9,6 +10,10 @@ export async function POST(request: Request) {
 
   try {
     const { resume, instruction } = await request.json()
+    const resumeErr = checkLength(JSON.stringify(resume), LIMITS.JSON_DOCUMENT, "resume")
+    if (resumeErr) return resumeErr
+    const instrErr = checkLength(typeof instruction === "string" ? instruction : "", LIMITS.INSTRUCTION, "instruction")
+    if (instrErr) return instrErr
     const updatedResume = await applyResumeEdit(resume, instruction)
     return NextResponse.json({ resume: updatedResume })
   } catch (error) {
