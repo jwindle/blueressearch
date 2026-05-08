@@ -5,6 +5,7 @@ import { segmentJobPost } from "@/lib/text-to-job-post"
 import { trackUsage } from "@/lib/usage"
 
 export async function POST(request: Request) {
+  console.log("OPENAI_API_KEY present:", !!process.env.OPENAI_API_KEY)
   if (!advancedEnabled()) {
     return NextResponse.json({ error: "Text to Job Post is disabled." }, { status: 403 })
   }
